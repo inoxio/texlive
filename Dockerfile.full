@@ -1,0 +1,4 @@
+ARG VERSION=2020.19
+FROM mkunze/texlive-basic:$VERSION
+
+RUN tlmgr install scheme-full

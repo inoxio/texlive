@@ -31,7 +31,6 @@ ENV HOME /data
 WORKDIR /data
 
 # Install latex packages
-RUN tlmgr install latexmk \
-    && tlmgr install scheme-full
+RUN tlmgr install latexmk
 
 VOLUME ["/data"]
