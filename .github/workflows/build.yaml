@@ -22,16 +22,22 @@ jobs:
       - name: Build image
         run: docker build . --file Dockerfile --tag "${IMAGE_NAME}"
 
-      - name: Log into registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u "${{ github.actor }}" --password-stdin
+      - name: Log into GitHub registry
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login docker.pkg.github.com -u "${{ github.actor }}" --password-stdin
+
+      - name: Log into DockerHub registry
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login --username "${{ secrets.DOCKERHUB_USER }}" --password-stdin
 
       - name: Push image
         run: |
-          IMAGE_ID=$(echo "docker.pkg.github.com/${{ github.repository }}/${IMAGE_NAME}" | tr '[:upper:]' '[:lower:]')
           VERSION=$(date +'%Y.%W')
 
-          echo IMAGE_ID="${IMAGE_ID}"
-          echo VERSION="${VERSION}"
+          GITHUB_REGISTRY=$(echo "docker.pkg.github.com/${{ github.repository }}/${IMAGE_NAME}:${VERSION}" | tr '[:upper:]' '[:lower:]')
+          DOCKERHUB_REGISTRY=$(echo "${{ secrets.DOCKERHUB_USER }}/${IMAGE_NAME}:${VERSION}" | tr '[:upper:]' '[:lower:]')
 
-          docker tag "${IMAGE_NAME}" "${IMAGE_ID}:${VERSION}"
-          docker push "${IMAGE_ID}:${VERSION}"
+          docker tag "${IMAGE_NAME}" "${GITHUB_REGISTRY}"
+          docker tag "${IMAGE_NAME}" "${DOCKERHUB_REGISTRY}"
+
+          docker push "${GITHUB_REGISTRY}"
+          docker push "${DOCKERHUB_REGISTRY}"
+
