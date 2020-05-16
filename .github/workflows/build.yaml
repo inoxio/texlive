@@ -27,12 +27,7 @@ jobs:
 
 #      - name: Push image
 #        run: |
-#          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/${IMAGE_NAME}
-#
-           Change all uppercase to lowercase
-#          IMAGE_ID=$(echo "${IMAGE_ID}" | tr '[:upper:]' '[:lower:]')
-#
-           year.calendarweek
+#          IMAGE_ID=$(echo "docker.pkg.github.com/${{ github.repository }}/${IMAGE_NAME}" | tr '[:upper:]' '[:lower:]')
 #          VERSION=$(date +'%Y.%W')
 #
 #          echo IMAGE_ID="${IMAGE_ID}"
