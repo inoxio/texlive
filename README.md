@@ -1,9 +1,16 @@
+# Texlive
+
 This dockerimage is suppose to build your latex project without installing any dependencies.
 It is quite big because it simply contains everything there is. Should work out of the box.
 
+It comes in two flavors:
+
+* Basic: https://hub.docker.com/r/mkunze/texlive-basic
+* Full: https://hub.docker.com/r/mkunze/texlive-full
+
 # Usage
 
-Simply change into the directory where you `main.tex` file is located and execute:
+Simply change into the directory where your `main.tex` file is located and execute:
 
 ```shell script
 docker run -v `pwd`:/data \
@@ -17,7 +24,6 @@ docker run -v `pwd`:/data \
        pdflatex --admin main.tex
 ```
 
-See https://hub.docker.com/repository/docker/mkunze/texlive-full/tags for list of all tags.
 Each week a new image is being build. Version number is `year.calendarweek`.
 
 You can also use it in your gitlab `.gitlab-ci.yml` pipeline if needed:
