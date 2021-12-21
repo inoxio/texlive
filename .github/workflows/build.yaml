@@ -33,11 +33,11 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build image
-        run: docker build --file Dockerfile.basic --tag "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-basic:$(date +'%Y.%W')" "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-basic:latest" .
+        run: docker build --file Dockerfile.basic --tag "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-basic:$(date +'%Y.%W')" --tag "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-basic:latest" .
 
       - name: Push to GitHub
         run: |
-          # docker push "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-basic" --all-tags
+          docker push "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-basic" --all-tags
 
   full:
     name: Build and Push Full Image
@@ -60,8 +60,8 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build image
-        run: docker build --file Dockerfile.full --build-arg "VERSION=$(date +'%Y.%W')" --tag "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-full:$(date +'%Y.%W')" "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-full:latest" .
+        run: docker build --file Dockerfile.full --build-arg "VERSION=$(date +'%Y.%W')" --tag "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-full:$(date +'%Y.%W')" --tag "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-full:latest" .
 
       - name: Push to GitHub
         run: |
-          # docker push "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-full" --all-tags
+          docker push "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-full" --all-tags
