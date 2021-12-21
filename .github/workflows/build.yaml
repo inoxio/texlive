@@ -5,33 +5,39 @@ on:
   schedule:
     - cron: '0 3 * * 1'
 
+env:
+  # Use docker.io for Docker Hub if empty
+  REGISTRY: ghcr.io
+  # github.repository as <account>/<repo>
+  IMAGE_NAME: ${{ github.repository }}
+
 jobs:
   basic:
     name: Build and Push Basic Image
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
       - name: Whats my IP
         run: curl --silent http://ipconfig.io
 
+      # Login against a Docker registry except on PR
+      # https://github.com/docker/login-action
+      - name: Log into registry ${{ env.REGISTRY }}
+        uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build image
-        run: docker build . --file Dockerfile.basic --tag texlive-basic
+        run: docker build --file Dockerfile.basic --tag "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-basic:$(date +'%Y.%W')" "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-basic:latest" .
 
       - name: Push to GitHub
         run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com --username "${{ github.actor }}" --password-stdin
-          GITHUB_REGISTRY=$(echo "docker.pkg.github.com/${{ github.repository }}/texlive-basic:$(date +'%Y.%W')" | tr '[:upper:]' '[:lower:]')
-          docker tag texlive-basic "${GITHUB_REGISTRY}"
-          docker push "${GITHUB_REGISTRY}"
-
-      - name: Push to DockerHub
-        run: |
-          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login --username "${{ secrets.DOCKERHUB_USER }}" --password-stdin
-          DOCKERHUB_REGISTRY=$(echo "${{ secrets.DOCKERHUB_USER }}/texlive-basic:$(date +'%Y.%W')" | tr '[:upper:]' '[:lower:]')
-          docker tag texlive-basic "${DOCKERHUB_REGISTRY}"
-          docker push "${DOCKERHUB_REGISTRY}"
+          # docker push "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-basic" --all-tags
 
   full:
     name: Build and Push Full Image
@@ -44,19 +50,18 @@ jobs:
       - name: Whats my IP
         run: curl --silent http://ipconfig.io
 
+      # Login against a Docker registry except on PR
+      # https://github.com/docker/login-action
+      - name: Log into registry ${{ env.REGISTRY }}
+        uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build image
-        run: docker build . --file Dockerfile.full --tag texlive-full --build-arg "VERSION=$(date +'%Y.%W')"
+        run: docker build --file Dockerfile.full --build-arg "VERSION=$(date +'%Y.%W')" --tag "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-full:$(date +'%Y.%W')" "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-full:latest" .
 
       - name: Push to GitHub
         run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com --username "${{ github.actor }}" --password-stdin
-          GITHUB_REGISTRY=$(echo "docker.pkg.github.com/${{ github.repository }}/texlive-full:$(date +'%Y.%W')" | tr '[:upper:]' '[:lower:]')
-          docker tag texlive-full "${GITHUB_REGISTRY}"
-          docker push "${GITHUB_REGISTRY}"
-
-      - name: Push to DockerHub
-        run: |
-          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login --username "${{ secrets.DOCKERHUB_USER }}" --password-stdin
-          DOCKERHUB_REGISTRY=$(echo "${{ secrets.DOCKERHUB_USER }}/texlive-full:$(date +'%Y.%W')" | tr '[:upper:]' '[:lower:]')
-          docker tag texlive-full "${DOCKERHUB_REGISTRY}"
-          docker push "${DOCKERHUB_REGISTRY}"
+          # docker push "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-full" --all-tags
