@@ -31,11 +31,11 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build image
-        run: >
-          docker build
-              --file Dockerfile.basic
-              --tag "${REGISTRY}/${IMAGE_NAME}-basic:$(date +'%Y.%W')"
-              --tag "${REGISTRY}/${IMAGE_NAME}-basic:latest"
+        run: |
+          docker build \
+              --file Dockerfile.basic \
+              --tag "${REGISTRY}/${IMAGE_NAME}-basic:$(date +'%Y.%W')" \
+              --tag "${REGISTRY}/${IMAGE_NAME}-basic:latest" \
               .
 
       - name: Push to registry ${{ env.REGISTRY }}
@@ -67,12 +67,12 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build image
-        run: >
-          docker build
-              --file Dockerfile.full
-              --build-arg "VERSION=$(date +'%Y.%W')"
-              --tag "${REGISTRY}/${IMAGE_NAME}-full:$(date +'%Y.%W')"
-              --tag "${REGISTRY}/${IMAGE_NAME}-full:latest"
+        run: |
+          docker build \
+              --file Dockerfile.full \
+              --build-arg "VERSION=$(date +'%Y.%W')" \
+              --tag "${REGISTRY}/${IMAGE_NAME}-full:$(date +'%Y.%W')" \
+              --tag "${REGISTRY}/${IMAGE_NAME}-full:latest" \
               .
 
       - name: Push to registry ${{ env.REGISTRY }}
