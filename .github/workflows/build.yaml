@@ -1,4 +1,4 @@
-name: Docker
+name: Build and Push
 
 on:
   push:
@@ -23,21 +23,29 @@ jobs:
       - name: Whats my IP
         run: curl --silent http://ipconfig.io
 
-      # Login against a Docker registry except on PR
-      # https://github.com/docker/login-action
       - name: Log into registry ${{ env.REGISTRY }}
-        uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
+        uses: docker/login-action@v1
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build image
-        run: docker build --file Dockerfile.basic --tag "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-basic:$(date +'%Y.%W')" --tag "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-basic:latest" .
+        run: >
+          docker build
+              --file Dockerfile.basic
+              --tag "${REGISTRY}/${IMAGE_NAME}-basic:$(date +'%Y.%W')"
+              --tag "${REGISTRY}/${IMAGE_NAME}-basic:latest"
+              .
 
-      - name: Push to GitHub
-        run: |
-          docker push "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-basic" --all-tags
+      - name: Push to registry ${{ env.REGISTRY }}
+        run: docker push "${REGISTRY}/${IMAGE_NAME}-basic" --all-tags
+
+      - name: Clean old images
+        uses: actions/delete-package-versions@v2
+        with:
+          package-name: 'texlive-basic'
+          min-versions-to-keep: 10
 
   full:
     name: Build and Push Full Image
@@ -45,23 +53,33 @@ jobs:
     needs: basic
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
       - name: Whats my IP
         run: curl --silent http://ipconfig.io
 
-      # Login against a Docker registry except on PR
-      # https://github.com/docker/login-action
       - name: Log into registry ${{ env.REGISTRY }}
-        uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
+        uses: docker/login-action@v1
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build image
-        run: docker build --file Dockerfile.full --build-arg "VERSION=$(date +'%Y.%W')" --tag "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-full:$(date +'%Y.%W')" --tag "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-full:latest" .
+        run: >
+          docker build
+              --file Dockerfile.full
+              --build-arg "VERSION=$(date +'%Y.%W')"
+              --tag "${REGISTRY}/${IMAGE_NAME}-full:$(date +'%Y.%W')"
+              --tag "${REGISTRY}/${IMAGE_NAME}-full:latest"
+              .
 
-      - name: Push to GitHub
-        run: |
-          docker push "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-full" --all-tags
+      - name: Push to registry ${{ env.REGISTRY }}
+        run: docker push "${REGISTRY}/${IMAGE_NAME}-full" --all-tags
+
+      - name: Clean old images
+        uses: actions/delete-package-versions@v2
+        with:
+          package-name: 'texlive-full'
+          min-versions-to-keep: 10
