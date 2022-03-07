@@ -42,7 +42,7 @@ jobs:
         run: docker push "${REGISTRY}/${IMAGE_NAME}-basic" --all-tags
 
       - name: Clean old images
-        uses: actions/delete-package-versions@v2
+        uses: actions/delete-package-versions@v3
         with:
           package-name: 'texlive-basic'
           min-versions-to-keep: 10
@@ -79,7 +79,7 @@ jobs:
         run: docker push "${REGISTRY}/${IMAGE_NAME}-full" --all-tags
 
       - name: Clean old images
-        uses: actions/delete-package-versions@v2
+        uses: actions/delete-package-versions@v3
         with:
           package-name: 'texlive-full'
           min-versions-to-keep: 10
