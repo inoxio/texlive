@@ -1,4 +1,4 @@
-ARG VERSION=2021.51
+ARG VERSION=2021.52
 FROM ghcr.io/inoxio/texlive-basic:$VERSION
 
 RUN tlmgr install scheme-full
